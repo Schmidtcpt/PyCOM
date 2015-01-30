@@ -1,0 +1,5 @@
+<?xml version="1.0" ?>
+<root>
+    <function name="users_reload" level="2"> </function>
+    <function name="methods_reload" level="2"> </function>
+</root>
