@@ -82,7 +82,7 @@ class ServerHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
             print cur_time + " failed to login " + form.list[0].name + form.list[0].value
             feedback['status'] = "error"
             feedback['description'] = "failed to login"
-            self.send_response(500)
+            self.send_response(400)
             self.send_header('Content-Type', 'application/json')
             self.end_headers()
 
