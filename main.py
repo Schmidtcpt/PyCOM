@@ -26,11 +26,12 @@ data = {}
 class ServerHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
 
     def do_GET(self):
-        logging.warning("======= GET STARTED =======")
-        logging.warning(self.headers)
+        self.send_response(200)
         SimpleHTTPServer.SimpleHTTPRequestHandler.do_GET(self)
 
     def do_POST(self):
+        feedback.clear()
+        data.clear()
         form = cgi.FieldStorage(
             fp=self.rfile,
             headers=self.headers,
@@ -62,32 +63,31 @@ class ServerHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
                             result = methodtocall(command.value)
 
                             if result:
-                                print "calling function" + command.name
+                                print cur_time + "Calling method " + command.name
                                 self.set_feedback("ok", True, "Method returned True")
                             else:
-                                print "function returned false"
+                                print "function " + command.name + " returned false"
                                 self.set_feedback("ok", False, "Method returned False")
                         else:
-                            print "no permissions"
+                            print cur_time + "Insufficient permissions"
                             self.set_feedback("error", False, "No permissions")
                     else:
-                        print "User permission error"
+                        print cur_time + "User permission error"
                         self.set_feedback("error", False, "User permission error")
                 else:
-                    print "Unknown command"
+                    print cur_time + "Unknown command"
                     self.set_feedback("error", False, "Unknown command" + command.name)
                 self.wfile.write(feedback)
                 print json.dumps(feedback)
         else:
-            print cur_time + " failed to login " + form.list[0].name + form.list[0].value
+            print cur_time + " failed to login " + form.list[0].name + " with password " + form.list[0].value
             feedback['status'] = "error"
             feedback['description'] = "failed to login"
             self.send_response(400)
             self.send_header('Content-Type', 'application/json')
             self.end_headers()
 
-
-        SimpleHTTPServer.SimpleHTTPRequestHandler.do_GET(self)
+        # SimpleHTTPServer.SimpleHTTPRequestHandler.do_GET(self)
 
     def check_auth(self, get_username, get_password):
         if loader.users[get_username] == get_password:

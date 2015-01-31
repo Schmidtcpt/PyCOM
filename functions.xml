@@ -2,4 +2,5 @@
 <root>
     <function name="users_reload" level="2"> </function>
     <function name="methods_reload" level="2"> </function>
+    <function name="Led" level="2"> </function>
 </root>
