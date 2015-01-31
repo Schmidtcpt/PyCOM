@@ -5,4 +5,6 @@
     <function name="Led" level="2"> </function>
     <function name="lsus" level="1"> </function>
     <function name="lsfn" level="1"> </function>
+    <function name="play_sound" level="1"> </function>
+    <function name="comtest" level="1"> </function>
 </root>

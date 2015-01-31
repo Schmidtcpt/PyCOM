@@ -82,7 +82,7 @@ class ServerHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
                                     print cur_time + " Calling method " + command.name + "()"
                                     self.set_feedback("ok", True, "Method returned True")
                                 else:
-                                    print " Function " + command.name + " returned false"
+                                    print " Function " + command.name + "() returned false"
                                     self.set_feedback("ok", False, "Method returned False")
 
                                 feedback['returned'] = service.returned
@@ -102,9 +102,10 @@ class ServerHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
             print cur_time + " failed to login " + form.list[0].name + " with password " + form.list[0].value
             feedback['status'] = "error"
             feedback['description'] = "failed to login"
-            self.send_response(400)
+            self.send_response(200)
             self.send_header('Content-Type', 'application/json')
             self.end_headers()
+            self.wfile.write(feedback)
 
         # SimpleHTTPServer.SimpleHTTPRequestHandler.do_GET(self)
 
@@ -126,5 +127,5 @@ httpd = SocketServer.TCPServer(("", PORT), Handler)
 loader.load_users()
 loader.load_methods()
 
-print "Serving at: http://%(interface)s:%(port)s" % dict(interface=I or "localhost", port=PORT)
+print "Starting server at: http://%(interface)s:%(port)s" % dict(interface=I or "localhost", port=PORT)
 httpd.serve_forever()

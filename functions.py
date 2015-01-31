@@ -39,3 +39,20 @@ def lsfn(arg):
     froot = functions_file.getroot()
     for fchild in froot:
         service.returned[fchild.attrib['name']] = fchild.attrib['level']
+
+
+def play_sound(arg):
+    import serialcom
+    serialcom.send('COM3', 9600, '3')
+    return True
+
+
+def comtest(arg):
+    import serialcom
+    import service
+    out = serialcom.send_request('COM3', 9600, arg)
+    service.returned[arg] = out.strip()
+    if out.strip() == "Correct":
+        return True
+    else:
+        return False

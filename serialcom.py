@@ -15,6 +15,7 @@ def send(port, baud, command):
     com.open()
     com.write(command)
     com.close()
+    return True
 
 
 def readline(port, baud):
@@ -24,4 +25,17 @@ def readline(port, baud):
     com.timeout = 1
     com.setDTR(False)
     com.open()
-    com.readline()
+    return com.readline()
+
+
+def send_request(port, baud, command):
+    com = serial.Serial()
+    com.port = port
+    com.baudrate = baud
+    com.timeout = 1
+    com.setDTR(False)
+    com.open()
+    com.write(command)
+    com_return = com.readline()
+    com.close()
+    return com_return
