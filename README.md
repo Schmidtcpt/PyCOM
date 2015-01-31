@@ -1,8 +1,17 @@
 # PyCOM
-Controlling stuff with your arduino
+Controlling stuff with your arduino made easy :)
+
+
+## What is it?
+PyCOM combines the flexibility of the Python programming language and the endless posibilities of a REST webservice.
+You can controll almost everything and do anything.
+
+
+## Installation
+Download the files from Github and run main.py
+By default it runs on localhost:8000
 
 
 
-I will edit this once the project is finished.
 
-Python 2.7 :)
+More features to come :D
