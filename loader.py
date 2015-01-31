@@ -1,5 +1,10 @@
 import xml.etree.ElementTree as ET
 
+"""
+ This poart is loading the configuration files. It includes basic functions for
+ editing the files and accessing them.
+"""
+
 users = {}
 permissions = {}
 func_perm = {}

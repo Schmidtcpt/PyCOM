@@ -7,7 +7,11 @@ import sys
 import json
 import functions
 import loader
+import service
 
+"""
+ Listen for arguments when the server is starting
+"""
 if len(sys.argv) > 2:
     PORT = int(sys.argv[2])
     I = sys.argv[1]
@@ -23,15 +27,19 @@ cur_time = (time.strftime("%H:%M:%S"))
 feedback = {}
 data = {}
 
+
 class ServerHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
 
     def do_GET(self):
         self.send_response(200)
+        # It will display the index.html by default
         SimpleHTTPServer.SimpleHTTPRequestHandler.do_GET(self)
 
     def do_POST(self):
         feedback.clear()
         data.clear()
+        service.returned.clear()
+
         form = cgi.FieldStorage(
             fp=self.rfile,
             headers=self.headers,
@@ -42,43 +50,54 @@ class ServerHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
         username = form.list[0].name
         passcode = form.list[0].value
 
+        """
+        Some great stuff and decisions are made here.
+        1) check if the password is correct
+        2) foreach name-value pair run a loop
+        3) ignore the first input since it's for authendication only
+        """
+
         # Check if the user exists and the password is correct
         if self.check_auth(username, passcode):
             self.send_response(200)
             self.send_header('Content-Type', 'application/json')
             self.end_headers()
-            for item in form.list:
-                data[item.name] = item.value
-                feedback['data'] = data
             for command in form.list:
                 print cur_time + "(" + username + ")" + command.name + " => " + command.value
-                # Check if command (method) has a permission level and it exists
-                if command.name in loader.func_perm:
-                    level = loader.func_perm[command.name]
-                    # Check if permission level exists
-                    if username in loader.permissions:
-                        # Last check if user has permissions to call the function
-                        if loader.permissions[username] >= level:
-                            methodtocall = getattr(functions, command.name)
-                            result = methodtocall(command.value)
+                # Fix tha username-method bug
+                if command.name not in loader.users:
+                    for item in form.list:
+                        data[item.name] = item.value
+                        feedback['data'] = data
+                    # Check if command (method) has a permission level and it exists
+                    if command.name in loader.func_perm:
+                        level = loader.func_perm[command.name]
+                        # Check if permission level exists
+                        if username in loader.permissions:
+                            # Last check if user has permissions to call the function
+                            if loader.permissions[username] >= level:
+                                methodtocall = getattr(functions, command.name)
+                                result = methodtocall(command.value)
+                                if result:
+                                    print cur_time + " Calling method " + command.name + "()"
+                                    self.set_feedback("ok", True, "Method returned True")
+                                else:
+                                    print " Function " + command.name + " returned false"
+                                    self.set_feedback("ok", False, "Method returned False")
 
-                            if result:
-                                print cur_time + "Calling method " + command.name
-                                self.set_feedback("ok", True, "Method returned True")
+                                feedback['returned'] = service.returned
                             else:
-                                print "function " + command.name + " returned false"
-                                self.set_feedback("ok", False, "Method returned False")
+                                print cur_time + " Insufficient permissions"
+                                self.set_feedback("error", False, "No permissions")
                         else:
-                            print cur_time + "Insufficient permissions"
-                            self.set_feedback("error", False, "No permissions")
+                            print cur_time + " User permission error"
+                            self.set_feedback("error", False, "User permission error")
                     else:
-                        print cur_time + "User permission error"
-                        self.set_feedback("error", False, "User permission error")
-                else:
-                    print cur_time + "Unknown command"
-                    self.set_feedback("error", False, "Unknown command" + command.name)
+                        print cur_time + " Unknown command"
+                        self.set_feedback("error", False, "Unknown command" + command.name)
                 self.wfile.write(feedback)
                 print json.dumps(feedback)
+                print "--------------------------------"
         else:
             print cur_time + " failed to login " + form.list[0].name + " with password " + form.list[0].value
             feedback['status'] = "error"

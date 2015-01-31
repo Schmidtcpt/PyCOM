@@ -3,4 +3,6 @@
     <function name="users_reload" level="2"> </function>
     <function name="methods_reload" level="2"> </function>
     <function name="Led" level="2"> </function>
+    <function name="lsus" level="1"> </function>
+    <function name="lsfn" level="1"> </function>
 </root>
